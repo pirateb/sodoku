@@ -1,8 +1,6 @@
 #pragma once
 #include <array>
 #include <algorithm>
-#include <ctime>        // std::time
-#include <cstdlib>      // std::rand, std::srand
 
 template <typename T>
 class forward_iterator : public std::iterator<
@@ -41,7 +39,6 @@ public:
     int i = 0;
     std::generate(_range.begin(), _range.end(), [&i](){return i++;} );
     // shuffle
-    std::srand ( unsigned ( std::time(0) ) );
     std::random_shuffle(_range.begin(), _range.end());
   }
 

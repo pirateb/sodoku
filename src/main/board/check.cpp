@@ -44,7 +44,6 @@ bool checks::board_set(Board& board) {
 
 std::bitset<checks::VALID_SIZE> checks::get_valid_guesses(Board& board, size_t idx_x, size_t idx_y) {
   auto val = board.get(idx_x, idx_y);
-
   auto valid = get_all_values();
 
   std::for_each(board.get_column(idx_y).begin(),
@@ -65,9 +64,24 @@ std::bitset<checks::VALID_SIZE> checks::get_valid_guesses(Board& board, size_t i
   return valid;
 }
 
+int checks::get_random_valid_guess(Board& board, size_t idx_x, size_t idx_y)
+{
+  auto valid_guesses = get_valid_guesses(board, idx_x, idx_y);
+  if(!valid_guesses.any()) return Board::NOT_SET;
+
+  auto rng = RandomIntUniform(0, VALID_SIZE - 1).rand();
+  for(size_t i = 0; i < valid_guesses.size(); i++) {
+    auto pos = (rng + i) % valid_guesses.size();
+    if(valid_guesses.test(pos)) return pos;
+  }
+
+  std::cout << "why?" << std::endl;
+  return Board::NOT_SET; // shouldnt reach here
+}
+
 Board checks::create_random_board() {
   auto b = Board();
-  auto out = solve_recursive<RandomRange<VALID_SIZE>>(b);
+  auto out = solve_recursive<RandomRange<VALID_SIZE>> (b);
   return std::get<0>(out);
 }
 

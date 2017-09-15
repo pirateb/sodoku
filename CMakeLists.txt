@@ -21,7 +21,10 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 # The following folder will be included
 include_directories("${PROJECT_SOURCE_DIR}/src/main/")
 
+# debug build / can toggle
+add_definitions(-DDEBUG)
 add_executable(sodoku ${source_main} ${sources})
+target_compile_definitions(sodoku PUBLIC DEBUG)
 
 # Tests
 include(GoogleTest)

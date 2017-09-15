@@ -5,6 +5,7 @@
 #include <tuple>
 #include <string>
 #include <iostream>
+#include <board/random.hpp>
 
 namespace checks {
   constexpr size_t VALID_SIZE = 9;
@@ -47,16 +48,19 @@ namespace checks {
   }
 
   int num_errors_board(Board& board);
+
+  // determine if whole board is set
   bool board_set(Board& board);
+
   std::bitset<VALID_SIZE> get_valid_guesses(Board& board, size_t idx_x, size_t idx_y);
+  int get_random_valid_guess(Board& board, size_t idx_x, size_t idx_y);
 
   std::tuple<size_t, size_t> convert_index(size_t idx);
 
-  Board create_random_board();
   std::string serialize_board(Board& board);
 
   template<typename Generator>
-  std::tuple<Board, bool> solve_recursive(Board board) {
+  std::tuple<Board, bool> solve_recursive(Board& board) {
     if(checks::board_set(board)) {
       if(checks::check_board(board))
         return std::make_tuple(board, true);
@@ -75,17 +79,21 @@ namespace checks {
     auto possible_guesses = get_valid_guesses(board, idx_x, idx_y);
     for(auto i : Generator()) {
       if(possible_guesses.test(i)) {
-        // this is a possible guess
-        auto new_board = board;
-        new_board.set(idx_x, idx_y, i + 1);
-        auto possible_out = solve_recursive<Generator>(new_board);
+        auto old_value = board.get(idx_x, idx_y);
+        board.set(idx_x, idx_y, i + 1);
+        auto possible_out = solve_recursive<Generator>(board);
         if (std::get<1>( possible_out)) {
           return possible_out;
+        } else {
+          // reset old value
+          board.set(idx_x, idx_y, old_value);
         }
       }
     }
 
     return std::make_tuple(board, false);
   }
+
+  Board create_random_board();
 }
 
